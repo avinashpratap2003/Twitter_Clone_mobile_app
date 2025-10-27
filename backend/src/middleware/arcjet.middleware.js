@@ -1,8 +1,12 @@
 import { aj } from "../config/arcjet.js";
+import { ENV } from "../config/env.js";
 
 // Arcjet middleware for rate limiting, bot protection, and security
 
 export const arcjetMiddleware = async (req, res, next) => {
+  // Skip Arcjet security checks during local development or when the key is absent
+  if (!ENV.ARCJET_KEY || ENV.NODE_ENV !== "production") return next(); 
+
   try {
     const decision = await aj.protect(req, {
       requested: 1, // each request consumes 1 token
